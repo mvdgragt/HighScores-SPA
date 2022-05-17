@@ -1,0 +1,13 @@
+<div class="card border-info mb-3">
+  <a href="/games/<%= card.url_slug %>">
+    <div class="card-body text-info">
+      <div class="score-card-title">
+        <h4><%= card.game_title %></h4>
+        <h4><%= card.score %></h4>
+      </div>
+      <div class="score-card-name">
+        <p><%= card.player %>, <%= moment(card.score_date).format('L') %></p>
+      </div>
+    </div>
+  </a>
+</div>

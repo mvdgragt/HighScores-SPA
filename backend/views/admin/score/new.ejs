@@ -1,0 +1,59 @@
+
+<h1>Nytt highscore</h1>
+
+
+  <form method="post">
+  <div class="row mb-3">
+    <div class="col">
+      <div class="row mb-3">
+        <div class="col">
+          <select
+          type="text"
+          name="game"
+          class="form-select"
+          placeholder="genre">
+          <option selected disabled="disabled" required>Välj spel</option>
+          <% games.forEach(game => { %>
+            <option value ="<%= game.id %>"><%= game.game_title %></option>
+        <% }) %>
+          </select>
+          </div>
+      </div>
+    <div class="row mb-3">
+    <div class="col">
+      <input
+        type="text"
+        name="player"
+        class="form-control"
+        placeholder="Spelare"
+        value="<%= games.player %>"
+        required
+      />
+    </div>
+  </div>
+  <div class="row mb-3">
+      <div class="col">
+        <input
+          type="date"
+          name="score_date"
+          class="form-control"
+          placeholder="Datum"
+          value="<%= games.score_date %>"
+          required
+        />
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        <input
+          type="text"
+          name="score"
+          class="form-control"
+          placeholder="Poäng"
+          value="<%= games.score %>"
+          required
+        />
+      </div>
+    </div>
+  <button class="btn btn-primary">Lägg till</button>
+</form>

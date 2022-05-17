@@ -1,0 +1,24 @@
+<h1>Spel</h1>
+<a href="/admin/games/new" class="btn btn-primary">
+    Nytt spel
+</a>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Titel</th>
+            <th>Genre</th>
+            <th>Lanseringsår</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% games.forEach(game => { %>
+            <tr>
+                <td><%= game.id %></td>
+                <td><%= game.game_title %></td>
+                <td><%= game.genre %></td>
+                <td><%= game.release_year %></td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>

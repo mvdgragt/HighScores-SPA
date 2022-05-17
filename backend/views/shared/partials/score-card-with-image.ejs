@@ -1,0 +1,17 @@
+<div class="card border-info mb-3">
+  <a href="/games/<%= game.url_slug %>">
+  <div class="row no-gutters card-body text-info">  
+    <div class="col-sm-7">
+      <div class="card-body">
+        <h4 class="card-title"><%= game.game_title %></h4>
+        <div class="score-card-name">
+          <p><%= game.genre %>, <%= (game.release_year) %></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-5">
+      <img src="<%= game.image_url %>" class="card-img-top h-100 game-card-image image-card" alt="<%= game.game_title %>" style="max-width: 200px";/>
+    </div>
+  </div>
+</a>
+</div>

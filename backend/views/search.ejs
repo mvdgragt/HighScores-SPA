@@ -1,0 +1,14 @@
+<!-- ---------------------------------------------------- -->
+<!-- Search results                                       -->
+<!-- ---------------------------------------------------- -->
+<section class="search-results mb-4">
+    <div class="text-center mb-4">
+      <h2>Hittade <%= games.length %> <%= traffar %> på "<%= searchTerm %>"</h2>
+    </div>
+    <div class="row">
+      <% games.forEach(game => {  %>
+        <%- include("shared/partials/score-card-with-image", { game }) %>
+      <% }) %>
+        </div>
+    </div>
+  </section>

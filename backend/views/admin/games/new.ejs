@@ -1,0 +1,64 @@
+
+<h1>Nytt spel</h1>
+
+<form method="post">
+    <div class="row mb-3">
+      <div class="col">
+        <input
+          type="text"
+          name="game_title"
+          class="form-control"
+          placeholder="Titel"
+          required
+        />
+      </div>
+    </div>
+      <div class="row mb-3">
+      <div class="col">
+        <textarea
+          type="text"
+          name="description"
+          class="form-control"
+          placeholder="beskrivning av spelet"
+          required
+        ></textarea>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        <select
+        type="text"
+        name="genre"
+        class="form-select"
+        placeholder="genre">
+        <option value="" selected disabled="disabled" required>Välj genre</option>
+        <% for(var i=0; i < dropdownVals.length; i++) { %>
+          <option><%= dropdownVals[i] %></option>
+       <% } %>
+        </select>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col">
+        <input
+          type="text"
+          name="image_url"
+          class="form-control"
+          placeholder="url till bilden"
+          required
+        />
+      </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col">
+          <input
+            type="text"
+            name="release_year"
+            class="form-control"
+            placeholder="lanseringsår"
+            required
+          />
+        </div>
+      </div>
+    <button class="btn btn-primary">Lägg till</button>
+  </form>

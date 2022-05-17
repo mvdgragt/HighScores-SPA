@@ -1,0 +1,9 @@
+
+<section class="popular-products mb-4">
+  <h2 class="text-center">Highscores</h2>
+  <div class="row">
+    <% scorecards.forEach(card => {  %>
+      <%- include("shared/partials/score-card-with-score", { card }) %>
+    <% }) %>
+  </div>
+</section>

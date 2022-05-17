@@ -1,0 +1,40 @@
+body {
+  width: 60%;
+  padding: 10px;
+  margin: auto;
+}
+
+a {
+  text-decoration: none;
+}
+
+.game-card-image {
+  float: right;
+  border-radius: 25px;
+  padding: 0;
+}
+
+.game-card-details {
+    border-radius: 25px;
+}
+
+nav, .highscore-table {
+  text-align: center; 
+}
+
+.search {
+  max-width: 500px;
+  display: inline;
+}
+
+.score-card-title {
+  display: flex;
+  justify-content: space-between;
+}
+
+.score-card-name {
+  display: flex;
+}
+.text-center {
+  padding-bottom: 15px;
+}
