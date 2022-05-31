@@ -56,7 +56,7 @@ router.get('/:url_slug', async (req, res) => {
 
   game.id = await saveGame(game, db);
 
-    // Sätt Location-headern till "/api/game/tetris" (t.ex.)
+    // Sätt Location-headern till "/api/games/tetris" (t.ex.)
     res.location(`/api/games/${game.url_slug}`)
 
     // 201 Created
