@@ -6,7 +6,7 @@ const Home = () => {
     const [scores,setScores] = useState([]);
     
     useEffect(() => {
-        fetch('http://localhost:5000/api/scores')
+         fetch('http://localhost:5000/api/scores')
         .then(x => x.json())
         .then(scores => setScores(scores));
     }, [])

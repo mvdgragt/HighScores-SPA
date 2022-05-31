@@ -16,6 +16,8 @@ var gamesAdminRouter = require('./routes/admin/games');
 var scoresAdminRouter = require('./routes/admin/score');
 var scoresApiRouter = require('./routes/api/scores');
 var gamesApiRouter = require('./routes/api/games');
+var authRouter = require('./routes/jwtAuth');
+var dashboardRouter = require('./routes/dashboard');
 
 var app = express();
 
@@ -39,12 +41,16 @@ app.use((req, res, next)=>{
 });
 
 app.use(logger('dev'));
-app.use(express.json());
+app.use(express.json()); //req.body
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 
+// routes
+
+app.use('/auth', authRouter);
+app.use("/dashboard", dashboardRouter)
 app.use('/', indexRouter);
 app.use('/search', searchRouter);
 app.use('/games', gamesRouter);
@@ -76,5 +82,8 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+app.listen(5000, () => {
+  console.log("server is running on port 5000");
+});
 
 module.exports = app;
