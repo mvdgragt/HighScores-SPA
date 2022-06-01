@@ -1,7 +1,27 @@
 var express = require('express');
 var router = express.Router();
 
-// GET /api/games/{url_slug}
+/**
+ * @swagger
+ * /api/games:
+ *    get:
+ *      description: Get all games
+ *      tags: [Game] 
+ *      parameters:
+ *        - name: title
+ *          in: query
+ *          description: Game title
+ *          required: false
+ *      responses:
+ *        200:
+ *          description: List of games
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: array
+ *                items:
+ *                  $ref: '#/components/schemas/Game'
+ */
 
 router.get('/', async (req, res) => {
   const { title } = req.query;
@@ -17,13 +37,36 @@ router.get('/', async (req, res) => {
 });
 
 
+/**
+ * @swagger
+ * /api/games/{id}:
+ *    get:
+ *      description: Get game
+ *      tags: [Game]
+ *      parameters:
+ *        - name: id
+ *          in: path
+ *          description: Game id
+ *          required: true
+ *      responses:
+ *        200:
+ *          description: Returns game
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                $ref: '#/components/schemas/Game'
+ *        404:
+ *          description: Game not found
+ */
 
-router.get('/:url_slug', async (req, res) => {
+
+router.get('/:id', async (req, res) => {
   
-    const { url_slug } = req.params;
+    const { id } = req.params;
     const db = req.app.locals.db;
   
-    const game = await getGame(url_slug, db)
+    const game = await getGame(id, db)
 
     if (!game) {
         res.status(404).send();
@@ -105,26 +148,39 @@ return result.rows;
 
 }
 
-  async function getGame(url_slug, db) {
+async function getGame(id, db) {
      
-    const sql = `
-     SELECT g.id,
-            g.game_title,
-            g.description,
-            g.genre,
-            g.image_url,
-            g.release_year,
-            g.url_slug,
-            h.player,
-            h.score_date,
-            h.score
-       FROM highscores as h
-       JOIN games as g ON h.gameid = g.id
-      WHERE url_slug = $1
-     `;
-     const result = await db.query(sql, [url_slug])
+  const sql = `
+   SELECT id,
+          game_title,
+          description,
+          genre,
+          image_url,
+          release_year,
+          url_slug
+     FROM games
+    WHERE id = $1
+   `;
+
+  // async function getGame(id, db) {
+     
+  //   const sql = `
+  //    SELECT g.id,
+  //           g.game_title,
+  //           g.description,
+  //           g.genre,
+  //           g.image_url,
+  //           g.release_year,
+  //           g.url_slug,
+  //           h.player,
+  //           h.score_date,
+  //           h.score
+  //      FROM games as g
+  //     WHERE g.id = $1
+  //    `;
+     const result = await db.query(sql, [id])
   
-     const game = result.rows
+     const game = result.rows.length > 0 ? result.rows[0] : undefined;
       return game;
   }
 
@@ -179,3 +235,33 @@ const generateURLSlug = (game_title) =>
 
   
   module.exports = router;
+
+  /**
+   * @swagger:
+   * components:
+   *  schemas:
+   *    Game:
+   *      type: object
+   *      properties:
+   *        id:
+   *          type: integer
+   *          description: Game id
+   *        title: 
+   *          type: string
+   *          description: Game title
+   *        description:
+   *          type: string
+   *          description: Game description
+   *        genre:
+   *          type: string
+   *          description: Game genre
+   *        image_url:
+   *          type: string
+   *          description: Game image
+   *        release_year:
+   *          type: integer
+   *          description: Game release year
+   *        url_slug:
+   *          type: string
+   *          description: Game URL slug       
+   */
