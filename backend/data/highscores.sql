@@ -1,4 +1,3 @@
-
 CREATE TABLE games (
     id INTEGER GENERATED ALWAYS AS IDENTITY,
     game_title VARCHAR(250) NOT NULL,
@@ -18,7 +17,7 @@ CREATE TABLE highscores (
     score_date DATE NOT NULL,
     score INTEGER NOT NULL,
     PRIMARY KEY (id),
-	FOREIGN KEY (Gameid) REFERENCES Games(id)
+    FOREIGN KEY (Gameid) REFERENCES Games(id)
 );
 
 INSERT INTO
@@ -75,7 +74,7 @@ VALUES
 INSERT INTO
     highscores (gameid, player, score_date, score)
 VALUES
-    (	
+    (
         1,
         ' John Doe',
         '2022-01-01',
@@ -105,5 +104,16 @@ VALUES
         '2022-01-01',
         '987873'
     );
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE TABLE users(
+    user_id uuid DEFAULT uuid_generate_v4(),
+    user_name VARCHAR(255) NOT NULL,
+    user_email VARCHAR(255) NOT NULL UNIQUE,
+    user_password VARCHAR(255) NOT NULL,
+    PRIMARY KEY(user_id)
+);
 
-	
+INSERT INTO
+    users (user_name, user_email, user_password)
+VALUES
+    ('Admin', 'admin@gmail.com', 'admin123');

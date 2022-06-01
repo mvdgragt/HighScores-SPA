@@ -49,13 +49,18 @@ router.get('/:url_slug', async (req, res) => {
       image_url,
       release_year: parseFloat(release_year),
       url_slug: generateURLSlug(game_title)
+
+      
   };
 
 
   const db = req.app.locals.db;
 
   game.id = await saveGame(game, db);
-
+  if (!game) {
+    res.status(400).send();
+    return;
+  }
     // Sätt Location-headern till "/api/games/tetris" (t.ex.)
     res.location(`/api/games/${game.url_slug}`)
 

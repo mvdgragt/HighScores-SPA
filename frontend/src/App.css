@@ -19,11 +19,13 @@ a {
 }
 
 nav, .highscore-table {
-  text-align: center; 
+  text-align: right; 
 }
 
+.img {
+  justify-content: space-between;
+}
 .search {
-  max-width: 500px;
   display: inline;
 }
 
