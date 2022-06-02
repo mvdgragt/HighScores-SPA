@@ -7,7 +7,6 @@ var logger = require("morgan");
 var expressLayouts = require("express-ejs-layouts");
 const { Pool } = require("pg");
 const cors = require("cors");
-// var morgan = require("morgan");
 const swaggerUi = require("swagger-ui-express");
 const swaggerJSDoc = require("swagger-jsdoc");
 
@@ -21,9 +20,22 @@ var scoresAdminRouter = require("./routes/admin/score");
 
 // API
 var authApiRouter = require("./routes/api/auth");
-var gamesApiRouter = require("./routes/api/games_new");
-// var scoresApiRouter = require("./routes/api/scores");
+var gamesApiRouter = require("./routes/api/games");
+var scoresApiRouter = require("./routes/api/scores");
 
+
+// const options = {
+//   definition: {
+//     openapi: "3.0.0",
+//     info: {
+//       title: "Highscores API",
+//       version: "1.0.0",
+//       description: "A simple Express Highscores API"
+//     },
+    
+//   },
+//   apis: ["./routes/api/*.js"],
+// };
 
 const options = {
   definition: {
@@ -31,12 +43,26 @@ const options = {
     info: {
       title: "Highscores API",
       version: "1.0.0",
-      description: "A simple Express Highscores API"
+      description:
+      "A simple Express Highscores API"
     },
-    
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          in: "header",
+          bearerFormat: "JWT"
+        },
+      }
+    },
+    security: [{
+      bearerAuth: []
+    }],
   },
-  apis: ["./routes/api/*.js"],
+  apis: ['./routes/api/*.js']
 };
+
 
 
 const specs = swaggerJSDoc(options);
@@ -79,7 +105,7 @@ app.use("/admin/score", scoresAdminRouter);
 // API
 app.use("/api/auth", authApiRouter);
 app.use("/api/games", gamesApiRouter);
-// app.use("/api/scores", scoresApiRouter);
+app.use("/api/scores", scoresApiRouter);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 app.post("/api/highscore", (req, res) => {

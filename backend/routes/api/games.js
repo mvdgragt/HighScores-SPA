@@ -9,11 +9,6 @@ var authorize = require("../../middleware/authorize");
  *      summary: Get all games
  *      description: Get all games
  *      tags: [Game]
- *      parameters:
- *        - name: title
- *          in: query
- *          description: Game title
- *          required: false
  *      responses:
  *        200:
  *          description: List of games
@@ -26,10 +21,10 @@ var authorize = require("../../middleware/authorize");
  */
 
 router.get("/", async (req, res) => {
-  const { title } = req.query;
+
   const db = req.app.locals.db;
 
-  const games = title ? await searchGame(title, db) : await getGames(db);
+  const games = await getGames(db);
 
   res.json(games);
 });
@@ -189,7 +184,8 @@ WHERE game_title ILIKE '%' || $1 || '%'
   return result.rows;
 }
 
-async function getGame(id, db) {
+async function getGames(db) {
+
   const sql = `
    SELECT id,
           game_title,
@@ -199,30 +195,24 @@ async function getGame(id, db) {
           release_year,
           url_slug
      FROM games
-    WHERE id = $1
    `;
 
-  // async function getGame(id, db) {
 
-  //   const sql = `
-  //    SELECT g.id,
-  //           g.game_title,
-  //           g.description,
-  //           g.genre,
-  //           g.image_url,
-  //           g.release_year,
-  //           g.url_slug,
-  //           h.player,
-  //           h.score_date,
-  //           h.score
-  //      FROM games as g
-  //     WHERE g.id = $1
-  //    `;
-  const result = await db.query(sql, [id]);
+   const result = await db.query(sql);
 
-  const game = result.rows.length > 0 ? result.rows[0] : undefined;
-  return game;
+   const games = result.rows.map(game => ({
+     id: game.id,
+     game_title: game.game_title,
+     description: game.description,
+     genre: game.genre,
+     image_url: game.image_url,
+     release_year: game.release_year,
+     url_slug: game.url_slug
+   }));
+ 
+   return games;
 }
+
 
 async function saveGame(games, db) {
   const sql = `
