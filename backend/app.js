@@ -18,9 +18,11 @@ var gamesRouter = require("./routes/games");
 var gamesAdminRouter = require("./routes/admin/games");
 var scoresAdminRouter = require("./routes/admin/score");
 var scoresApiRouter = require("./routes/api/scores");
+
+
+// API
 var gamesApiRouter = require("./routes/api/games");
-var authRouter = require("./routes/jwtAuth");
-var dashboardRouter = require("./routes/dashboard");
+var authApiRouter = require("./routes/api/auth");
 
 const options = {
   definition: {
@@ -67,17 +69,18 @@ app.use(cors());
 
 // routes
 
-app.use("/auth", authRouter);
-app.use("/dashboard", dashboardRouter);
 app.use("/", indexRouter);
 app.use("/search", searchRouter);
 app.use("/games", gamesRouter);
 app.use("/admin/games", gamesAdminRouter);
 app.use("/admin/score", scoresAdminRouter);
+
+// API
 app.use("/api/scores", scoresApiRouter);
 app.use("/api/games", gamesApiRouter);
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+app.use("/api/auth", authApiRouter);
 
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 app.post("/api/highscore", (req, res) => {
   res.json(req.body);
 });

@@ -1,7 +1,24 @@
 var express = require('express');
 var router = express.Router();
+var authorize = require('../../middleware/authorize')
 
-// GET /api/scores
+/**
+ * @swagger
+ * /api/scores:
+ *    get:
+ *      summary: Get all scores
+ *      description: Get all scores
+ *      tags: [Highscores]
+ *      responses:
+ *        200:
+ *          description: List of highscores
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: array
+ *                items:
+ *                  $ref: '#/components/schemas/Score'
+ */
 
 router.get('/', async (req, res) => {
   const db = req.app.locals.db;
@@ -25,6 +42,29 @@ async function getScores(db) {
   return result.rows;
 }
 
+/**
+ * @swagger
+ * /api/scores/{url_slug}/highscores:
+ *    get:
+ *      summary: Get all scores per game
+ *      description: Get highscores per game
+ *      tags: [Highscores]
+ *      parameters:
+ *        - name: url_slug
+ *          in: path
+ *          description: Highscores per game
+ *          required: true
+ *      responses:
+ *        200:
+ *          description: Returns highscores per game
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                $ref: '#/components/schemas/Score'
+ *        404:
+ *          description: Game not found
+ */
 
 router.get('/:url_slug/highscores', async (req, res) => {
   
@@ -81,7 +121,42 @@ async function saveScore(highscores, db) {
 
 }
 
-router.post('/', async (req,res) => {
+/**
+ * @swagger
+ * /api/scores:
+ *   post:
+ *     summary: Register new highscore
+ *     description: Register new highscore
+ *     tags: [Highscores]
+ *     consumes:
+ *       - application/json
+ *     requestBody:
+ *       description: Highscore details
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             $ref: '#/components/schemas/NewScore'
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       201:
+ *         description: Returns highscore
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               $ref: '#/components/schemas/Score'
+ *       400:
+ *         description: Invalid highscore
+ *       401:
+ *         description: Invalid token
+ *       403:
+ *         description: Not allowed
+ */
+
+router.post('/', authorize, async (req,res) => {
   const {
     gameid,
     player,
@@ -109,3 +184,47 @@ highscores.id = await saveScore(highscores, db);
 })
 
 module.exports = router;
+
+
+/**
+ * @swagger:
+ * components:
+ *  schemas:
+ *    Score:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: integer
+ *          description: id
+ *        gameid:
+ *          type: integer
+ *          description: gameid
+ *        player:
+ *          type: string
+ *          description: player
+ *        score_date:
+ *          type: string
+ *          description: score_date
+ *        score:
+ *          type: integer
+ *          description: score
+ *    NewScore:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: integer
+ *          description: id
+ *        gameid:
+ *          type: integer
+ *          description: gameid
+ *        player:
+ *          type: string
+ *          description: player
+ *        score_date:
+ *          type: string
+ *          description: score_date
+ *        score:
+ *          type: integer
+ *          description: score
+ 
+ */

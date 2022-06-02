@@ -1,12 +1,14 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
+var authorize = require("../../middleware/authorize");
 
 /**
  * @swagger
  * /api/games:
  *    get:
+ *      summary: Get all games
  *      description: Get all games
- *      tags: [Game] 
+ *      tags: [Game]
  *      parameters:
  *        - name: title
  *          in: query
@@ -23,24 +25,20 @@ var router = express.Router();
  *                  $ref: '#/components/schemas/Game'
  */
 
-router.get('/', async (req, res) => {
+router.get("/", async (req, res) => {
   const { title } = req.query;
   const db = req.app.locals.db;
 
-
-
-  const games = title 
-      ? await searchGame(title, db)
-      : await getGames(db);
+  const games = title ? await searchGame(title, db) : await getGames(db);
 
   res.json(games);
 });
-
 
 /**
  * @swagger
  * /api/games/{id}:
  *    get:
+ *      summary: Get game based on id
  *      description: Get game
  *      tags: [Game]
  *      parameters:
@@ -60,42 +58,65 @@ router.get('/', async (req, res) => {
  *          description: Game not found
  */
 
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  const db = req.app.locals.db;
 
-router.get('/:id', async (req, res) => {
-  
-    const { id } = req.params;
-    const db = req.app.locals.db;
-  
-    const game = await getGame(id, db)
+  const game = await getGame(id, db);
 
-    if (!game) {
-        res.status(404).send();
-        return;
-      }
-  
-    res.json(game);
-  });
+  if (!game) {
+    res.status(404).send();
+    return;
+  }
 
-  router.post('/', async (req,res) => {
-    const {
-      game_title,
-      description,
-      genre,
-      image_url,
-      release_year
-    } = req.body;
+  res.json(game);
+});
 
-    const game = {
-      game_title,
-      description,
-      genre,
-      image_url,
-      release_year: parseFloat(release_year),
-      url_slug: generateURLSlug(game_title)
+/**
+ * @swagger
+ * /api/games:
+ *   post:
+ *     summary: Create new game
+ *     description: Create new game
+ *     tags: [Game]
+ *     consumes:
+ *       - application/json
+ *     requestBody:
+ *       description: Game details
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             $ref: '#/components/schemas/NewGame'
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       201:
+ *         description: Returns game
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               $ref: '#/components/schemas/Game'
+ *       400:
+ *         description: Invalid game
+ *       401:
+ *         description: Invalid token
+ *       403:
+ *         description: Not allowed
+ */
+router.post("/", authorize, async (req, res) => {
+  const { game_title, description, genre, image_url, release_year } = req.body;
 
-      
+  const game = {
+    game_title,
+    description,
+    genre,
+    image_url,
+    release_year: parseFloat(release_year),
+    url_slug: generateURLSlug(game_title),
   };
-
 
   const db = req.app.locals.db;
 
@@ -104,35 +125,56 @@ router.get('/:id', async (req, res) => {
     res.status(400).send();
     return;
   }
-    // Sätt Location-headern till "/api/games/tetris" (t.ex.)
-    res.location(`/api/games/${game.url_slug}`)
+  // Sätt Location-headern till "/api/games/tetris" (t.ex.)
+  res.location(`/api/games/${game.url_slug}`);
 
-    // 201 Created
-    res.status(201).send(game)
-  })
-  
-  router.delete('/:id', async (req, res) => {
-    
-    const gameId = req.params.id;
-    const db = req.app.locals.db;
-    
-    await deleteGame(gameId,db);
+  // 201 Created
+  res.status(201).send(game);
+});
 
-    //No content
-    res.status(204).send()
-  });
 
-  async function deleteGame(id,db) {
-    const sql = `
+/**
+ * @swagger
+ * /api/games/{id}:
+ *   delete:
+ *     summary: Delete game based on id
+ *     description: Delete game
+ *     tags: [Game]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         description: Game id
+ *         required: true
+ *     responses:
+ *       204:
+ *         description: Game deleted
+ *       401:
+ *         description: Not logged in
+ *       403:
+ *         description: Not allowed
+ * 
+ */
+router.delete("/:id", authorize, async (req, res) => {
+  const gameId = req.params.id;
+  const db = req.app.locals.db;
+
+  await deleteGame(gameId, db);
+
+  //No content
+  res.status(204).send();
+});
+
+async function deleteGame(id, db) {
+  const sql = `
       DELETE FROM games
             WHERE id = $1
     `;
-  
+
   await db.query(sql, [id]);
 }
 
 async function searchGame(title, db) {
-const sql = `
+  const sql = `
 select 	id,
 		    game_title,
         description,
@@ -142,14 +184,12 @@ select 	id,
         url_slug
   from  games
 WHERE game_title ILIKE '%' || $1 || '%'
-`
-const result = await db.query(sql, [title]);
-return result.rows;
-
+`;
+  const result = await db.query(sql, [title]);
+  return result.rows;
 }
 
 async function getGame(id, db) {
-     
   const sql = `
    SELECT id,
           game_title,
@@ -163,7 +203,7 @@ async function getGame(id, db) {
    `;
 
   // async function getGame(id, db) {
-     
+
   //   const sql = `
   //    SELECT g.id,
   //           g.game_title,
@@ -178,14 +218,14 @@ async function getGame(id, db) {
   //      FROM games as g
   //     WHERE g.id = $1
   //    `;
-     const result = await db.query(sql, [id])
-  
-     const game = result.rows.length > 0 ? result.rows[0] : undefined;
-      return game;
-  }
+  const result = await db.query(sql, [id]);
 
-  async function getGames(db) {
-    const sql = `
+  const game = result.rows.length > 0 ? result.rows[0] : undefined;
+  return game;
+}
+
+async function getGames(db) {
+  const sql = `
     SELECT 	id,
             game_title,
             description,
@@ -195,15 +235,14 @@ async function getGame(id, db) {
             url_slug
       FROM  games
       `;
-  
-    const result = await db.query(sql);
-  
-    return result.rows;
-  }
 
-  async function saveGame(games, db) {
+  const result = await db.query(sql);
 
-    const sql = `
+  return result.rows;
+}
+
+async function saveGame(games, db) {
+  const sql = `
         INSERT INTO games (
             game_title,
             description,
@@ -216,52 +255,67 @@ async function getGame(id, db) {
         RETURNING id
     `;
 
-    const result = await db.query(sql, [
-        games.game_title,
-        games.description,
-        games.genre,
-        games.image_url,
-        games.release_year,
-        games.url_slug
-    ]);
-    return result.rows[0].id;
-
+  const result = await db.query(sql, [
+    games.game_title,
+    games.description,
+    games.genre,
+    games.image_url,
+    games.release_year,
+    games.url_slug,
+  ]);
+  return result.rows[0].id;
 }
 
 const generateURLSlug = (game_title) =>
-    game_title.replace('-', '')
-        .replaceAll(' ', '-')
-        .toLowerCase();
+  game_title.replace("-", "").replaceAll(" ", "-").toLowerCase();
 
-  
-  module.exports = router;
+module.exports = router;
 
-  /**
-   * @swagger:
-   * components:
-   *  schemas:
-   *    Game:
-   *      type: object
-   *      properties:
-   *        id:
-   *          type: integer
-   *          description: Game id
-   *        title: 
-   *          type: string
-   *          description: Game title
-   *        description:
-   *          type: string
-   *          description: Game description
-   *        genre:
-   *          type: string
-   *          description: Game genre
-   *        image_url:
-   *          type: string
-   *          description: Game image
-   *        release_year:
-   *          type: integer
-   *          description: Game release year
-   *        url_slug:
-   *          type: string
-   *          description: Game URL slug       
-   */
+/**
+ * @swagger:
+ * components:
+ *  schemas:
+ *    Game:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: integer
+ *          description: Game id
+ *        title:
+ *          type: string
+ *          description: Game title
+ *        description:
+ *          type: string
+ *          description: Game description
+ *        genre:
+ *          type: string
+ *          description: Game genre
+ *        image_url:
+ *          type: string
+ *          description: Game image
+ *        release_year:
+ *          type: integer
+ *          description: Game release year
+ *        url_slug:
+ *          type: string
+ *          description: Game URL slug
+ *    NewGame:
+ *      type: object
+ *      properties:
+ *        title:
+ *          type: string
+ *          description: Game title
+ *        description:
+ *          type: string
+ *          description: Game description
+ *        genre:
+ *          type: string
+ *          description: Game genre
+ *        image_url:
+ *          type: string
+ *          description: Game image
+ *        release_year:
+ *          type: integer
+ *          description: Game release year
+ * 
+ */
