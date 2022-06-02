@@ -42,43 +42,42 @@ const jwt = require('jsonwebtoken');
  */
 
 router.post("/", async function (req, res) {
-    const { user_name, user_password } = req.body;
-  
-    const db = req.app.locals.db;
-  
-    const user = await findUser(user_name, user_password, db);
-  
-    if (!user) {
-      res.status(401).send(); // 401 Unauthorized
-      return;
-    }
-  
-    const token = generateToken();
-    res.json({ token });
-  });
-  
-  function generateToken() {
-  const token = jwt.sign({}, 'GREEN');
-    return token;
-  
+  const { user_name, user_password } = req.body;
+
+  const db = req.app.locals.db;
+
+  const user = await findUser(user_name, user_password, db);
+
+  if (!user) {
+    res.status(401).send(); // 401 Unauthorized
+    return;
   }
-  
-  async function findUser(user_name, user_password, db) {
-    const sql = `
-      SELECT  user_id,
-              user_name,
-              user_email
-        FROM  "users"
-       WHERE  user_name = $1
-         AND  user_password = $2
-      `;
-  
-    const result = await db.query(sql, [user_name, user_password]);
-  
-    let user = result.rows.length ? result.rows[0] : undefined;
-  
-    return user;
-  }
-  
+
+  const token = generateToken();
+  res.json({ token });
+});
+
+function generateToken() {
+const token = jwt.sign({}, 'GREEN');
+  return token;
+
+}
+
+async function findUser(user_name, user_password, db) {
+  const sql = `
+    SELECT  user_id,
+            user_name,
+            user_email
+      FROM  "users"
+     WHERE  user_name = $1
+       AND  user_password = $2
+    `;
+
+  const result = await db.query(sql, [user_name, user_password]);
+
+  let user = result.rows.length ? result.rows[0] : undefined;
+
+  return user;
+}
 
 module.exports = router;

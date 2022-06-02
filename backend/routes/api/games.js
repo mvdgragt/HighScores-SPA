@@ -224,23 +224,6 @@ async function getGame(id, db) {
   return game;
 }
 
-async function getGames(db) {
-  const sql = `
-    SELECT 	id,
-            game_title,
-            description,
-            genre,
-            image_url,
-            release_year,
-            url_slug
-      FROM  games
-      `;
-
-  const result = await db.query(sql);
-
-  return result.rows;
-}
-
 async function saveGame(games, db) {
   const sql = `
         INSERT INTO games (
@@ -265,9 +248,6 @@ async function saveGame(games, db) {
   ]);
   return result.rows[0].id;
 }
-
-const generateURLSlug = (game_title) =>
-  game_title.replace("-", "").replaceAll(" ", "-").toLowerCase();
 
 module.exports = router;
 

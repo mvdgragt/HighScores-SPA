@@ -17,12 +17,13 @@ var searchRouter = require("./routes/search");
 var gamesRouter = require("./routes/games");
 var gamesAdminRouter = require("./routes/admin/games");
 var scoresAdminRouter = require("./routes/admin/score");
-var scoresApiRouter = require("./routes/api/scores");
 
 
 // API
-var gamesApiRouter = require("./routes/api/games");
 var authApiRouter = require("./routes/api/auth");
+var gamesApiRouter = require("./routes/api/games_new");
+// var scoresApiRouter = require("./routes/api/scores");
+
 
 const options = {
   definition: {
@@ -76,9 +77,9 @@ app.use("/admin/games", gamesAdminRouter);
 app.use("/admin/score", scoresAdminRouter);
 
 // API
-app.use("/api/scores", scoresApiRouter);
-app.use("/api/games", gamesApiRouter);
 app.use("/api/auth", authApiRouter);
+app.use("/api/games", gamesApiRouter);
+// app.use("/api/scores", scoresApiRouter);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 app.post("/api/highscore", (req, res) => {
@@ -101,10 +102,6 @@ app.use(function (err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render("error");
-});
-
-app.listen(5000, () => {
-  console.log("server is running on port 5000");
 });
 
 module.exports = app;
